@@ -26,10 +26,10 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copiar o arquivo JAR da etapa de construção
-COPY --from=build /app/target/API-Cadeia-0.0.1-SNAPSHOT.jar /app/Jogador_Clube.jar
+COPY --from=build /app/target/Jogador_Clube-0.0.1-SNAPSHOT.jar /app/Jogador_Clube.jar
 
 # Expor a porta que o Spring Boot vai rodar (por padrão, 8080)
-EXPOSE 8080
+EXPOSE 8000
 
 # Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "/app/Jogador_Clube.jar"]
