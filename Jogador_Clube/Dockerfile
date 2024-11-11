@@ -32,7 +32,7 @@ WORKDIR /app
 COPY --from=build /app/target/users-0.0.1-SNAPSHOT.jar users.jar
 
 # Expose port 8080
-EXPOSE 8080
+EXPOSE 8000
 
 # Define the entrypoint
 ENTRYPOINT ["java", "-jar", "users.jar"]
