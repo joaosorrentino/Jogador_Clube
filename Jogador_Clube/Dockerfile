@@ -1,6 +1,6 @@
 # Etapa 1: Construir a aplicação usando Maven 4.0.0 (caso tenha uma imagem específica)
 FROM maven:3.9.4-eclipse-temurin-21 AS build
-LABEL authors="thiagorangel"
+LABEL authors="sorrentino"
 LABEL description = "a"
 # Definir o diretório de trabalho
 WORKDIR /app
@@ -26,7 +26,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copiar o arquivo JAR da etapa de construção
-COPY --from=build /app/target/API-Cadeia-0.0.1-SNAPSHOT.jar /app/API-Cadeia.jar
+COPY --from=build /app/target/API-Cadeia-0.0.1-SNAPSHOT.jar /app/Jogador_Clube.jar
 
 # Expor a porta que o Spring Boot vai rodar (por padrão, 8080)
 EXPOSE 8080
