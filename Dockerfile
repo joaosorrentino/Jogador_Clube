@@ -1,4 +1,4 @@
-# Etapa 1: Construir a aplicação usando Maven 4.0.0 (caso tenha uma imagem específica)
+# Etapa 1: Construir a aplicação usando Maven
 FROM maven:3.9.4-eclipse-temurin-21 AS build
 LABEL authors="sorrentino"
 LABEL description="a"
@@ -6,21 +6,17 @@ LABEL description="a"
 # Definir o diretório de trabalho
 WORKDIR /app
 
-# Copiar o Maven Wrapper e o pom.xml
-COPY mvnw ./
+# Copiar o pom.xml
 COPY pom.xml ./
 
-# Dar permissão de execução ao wrapper
-RUN chmod +x mvnw
-
 # Baixar as dependências para aproveitar o cache
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 # Copiar o código fonte
 COPY src ./src
 
 # Construir a aplicação
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Etapa 2: Criar a imagem para rodar a aplicação com Java
 FROM eclipse-temurin:21-jre
