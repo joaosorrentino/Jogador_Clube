@@ -1,21 +1,34 @@
 package com.example.Jogador_Clube.Model;
-
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import jakarta.persistence.*;
 import java.util.List;
 
 @XmlRootElement
+@Entity
+@Table(name = "Clube") // Nome da tabela no banco de dados
 public class Clube {
-    private Integer id;
-    private String nome;
-    private List<Jogador> Jogador;
 
-    public Clube(Integer id, String nome, List<com.example.Jogador_Clube.Model.Jogador> jogador) {
-        this.id = id;
-        this.nome = nome;
-        Jogador = jogador;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Geração automática do ID
+    private Integer id;
+
+    @Column(nullable = false, unique = true) // Nome é obrigatório e único
+    private String nome;
+
+    @OneToMany(mappedBy = "clube", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Jogador> jogadores;
+
+    public Clube() {
     }
 
+    public Clube(Integer id, String nome, List<Jogador> jogadores) {
+        this.id = id;
+        this.nome = nome;
+        this.jogadores = jogadores;
+    }
+
+    // Getters e Setters
     public Integer getId() {
         return id;
     }
@@ -33,10 +46,10 @@ public class Clube {
     }
 
     public List<Jogador> getJogador() {
-        return Jogador;
+        return jogadores;
     }
 
-    public void setJogador(List<Jogador> jogador) {
-        Jogador = jogador;
+    public void setJogador(List<Jogador> jogadores) {
+        this.jogadores = jogadores;
     }
 }

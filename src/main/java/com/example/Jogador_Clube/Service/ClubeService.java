@@ -2,85 +2,72 @@ package com.example.Jogador_Clube.Service;
 
 import com.example.Jogador_Clube.Model.Clube;
 import com.example.Jogador_Clube.Model.Jogador;
+import com.example.Jogador_Clube.Repository.ClubeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClubeService {
-    public List<Clube> clubes;
 
+    @Autowired
+    private ClubeRepository clubeRepository;
 
-    public ClubeService() {
-        clubes = new ArrayList<>();
+    // Retorna a lista de todos os nomes dos clubes
+    public List<String> findAllClubes() {
+        return clubeRepository.findAll().stream()
+                .map(Clube::getNome)
+                .toList();
     }
 
-
-    public List<String> findAllClubes(){
-       List<String> nomesClubes = new ArrayList<>();
-       for(Clube clube : clubes){
-           nomesClubes.add(clube.getNome());
-       }
-       return nomesClubes;
+    // Retorna um clube pelo ID
+    public Clube getClubeById(Integer id) {
+        return clubeRepository.findById(id).orElse(null);
     }
 
-    public Clube getClubeById(Integer id){
-        for (Clube clube : clubes) {
-            if (clube.getId().equals(id)) {
-                return clube;
-            }
+    // Retorna um clube pelo nome
+    public Clube getClubeByNome(String nome) {
+        return clubeRepository.findByNomeIgnoreCase(nome);
+    }
+
+    // Salva um clube no banco
+    public void saveClube(Integer id, String nome) {
+        Clube clube = new Clube(id, nome, null);
+        clubeRepository.save(clube);
+    }
+
+    // Edita os dados de um clube existente
+    public Clube editClube(String nome, Integer id) {
+        Optional<Clube> optionalClube = clubeRepository.findById(id);
+        if (optionalClube.isPresent()) {
+            Clube clube = optionalClube.get();
+            clube.setNome(nome);
+            return clubeRepository.save(clube);
         }
         return null;
     }
 
-    public Clube getClubeByNome(String nome){
-        for (Clube clube : clubes) {
-            if (clube.getNome().equalsIgnoreCase(nome)) {
-                return clube;
-            }
-        }
-        return null;
-    }
-
-    public void saveClube(Integer id,String nome) {
-        Clube clube = new Clube(id,nome,null);
-        clubes.add(clube);
-    }
-
-    public Clube editClube(String nome,Integer Id) {
-        Clube clube = getClubeById(Id);
-        for(Clube c : clubes) {
-            if (c.getId().equals(Id)) {
-                c.setId(Id);
-                c.setNome(nome);
-            } else {
-                return null;
-            }
-        }
-        return clube;
-    }
-
-    public void deleteClube(Integer Id) {
-        for(Clube clube : clubes){
-            if (clube.getId().equals(Id)){
-                List<Jogador> jogador = getJogadoresByClube(clube.getNome());
-                clubes.remove(clube);
-            }
+    // Deleta um clube pelo ID
+    public void deleteClube(Integer id) {
+        Optional<Clube> optionalClube = clubeRepository.findById(id);
+        if (optionalClube.isPresent()) {
+            Clube clube = optionalClube.get();
+            clubeRepository.delete(clube);
         }
     }
 
-    public List<Jogador> getJogadoresByClube(String nome){
-        for(Clube clube : clubes){
-            if(clube.getNome().equalsIgnoreCase(nome)){
-                return clube.getJogador();
-            }
-        }
-        return null;
+    // Retorna a lista de jogadores de um clube pelo nome do clube
+    public List<Jogador> getJogadoresByClube(String nome) {
+        Clube clube = clubeRepository.findByNomeIgnoreCase(nome);
+        return clube != null ? clube.getJogador() : null;
     }
 
-    public void addJogadorInClube(Integer id,String jogador, Integer idjogador){
-        Clube clube = getClubeById(id);
+    // Adiciona um jogador a um clube
+    public void addJogadorInClube(Integer idClube, String nomeJogador, Integer idJogador) {
+        Clube clube = clubeRepository.findById(idClube).orElse(null);
         if (clube != null) {
             List<Jogador> jogadores = clube.getJogador();
             if (jogadores == null) {
@@ -88,10 +75,13 @@ public class ClubeService {
                 clube.setJogador(jogadores);
             }
 
-            boolean jogadorExiste = jogadores.stream().anyMatch(j -> j.getNome().equalsIgnoreCase(jogador));
+            boolean jogadorExiste = jogadores.stream()
+                    .anyMatch(j -> j.getNome().equalsIgnoreCase(nomeJogador));
+
             if (!jogadorExiste) {
-                Jogador novoJogador = new Jogador(idjogador, jogador, clube.getNome());
+                Jogador novoJogador = new Jogador(idJogador, nomeJogador, clube);
                 jogadores.add(novoJogador);
+                clubeRepository.save(clube); // Persistir a atualização no banco
             }
         }
     }

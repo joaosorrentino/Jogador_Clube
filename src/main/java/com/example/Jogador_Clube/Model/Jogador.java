@@ -2,20 +2,33 @@ package com.example.Jogador_Clube.Model;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
 
+import jakarta.persistence.*;
+
 @XmlRootElement
+@Entity
+@Table(name = "jogagdor") // Nome da tabela no banco de dados
 public class Jogador {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Geração automática do ID
     private Integer id;
+
+    @Column(nullable = false) // Nome obrigatório
     private String nome;
-    private String clube;
 
+    @ManyToOne // Relacionamento muitos-para-um com a classe Clube
+    @JoinColumn(name = "clube_id", nullable = false) // Chave estrangeira para o clube
+    private Clube clube;
 
-    public Jogador(Integer id, String nome, String clube) {
+    public Jogador() {
+    }
+    public Jogador(Integer id, String nome, Clube clube) {
         this.id = id;
         this.nome = nome;
         this.clube = clube;
     }
 
+    // Getters e Setters
     public Integer getId() {
         return id;
     }
@@ -32,11 +45,11 @@ public class Jogador {
         this.nome = nome;
     }
 
-    public String getClube() {
+    public Clube getClube() {
         return clube;
     }
 
-    public void setClube(String clube) {
+    public void setClube(Clube clube) {
         this.clube = clube;
     }
 }
